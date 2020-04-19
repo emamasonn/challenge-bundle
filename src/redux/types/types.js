@@ -1,0 +1,9 @@
+export const CREATEITEM = 'CREATEITEM';
+export const DELETE = "DELETE"
+export const ORDER = 'ORDER'
+export const ADDBUNDLE = 'ADDBUNDLE'
+export const DELETEBUNDLE = "DELETEBUNDLE"
+export const RECORDMEMORY = 'RECORDMEMORY'
+export const LOADLISTBUNDLE = 'LOADLISTBUNDLE'
+export const DELETELISTBUNDLE = 'DELETELISTBUNDLE'
+export const CANTITEM = 'CANTITEM'
