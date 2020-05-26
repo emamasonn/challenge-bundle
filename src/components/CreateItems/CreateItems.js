@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import NumberFormat from 'react-number-format';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Radio from '@material-ui/core/Radio';
@@ -46,8 +47,32 @@ const useStyles = makeStyles({
 })
 
 
+function NumberFormatCustom(props) {
+    const { inputRef, onChange, ...other } = props;
+  
+    return (
+      <NumberFormat
+        {...other}
+        getInputRef={inputRef}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        isNumericString
+        prefix="$"
+      />
+    );
+  }
+
+
 const CreateItems = (props) => {
     const classes = useStyles();
+    const [values, setValues] = useState();
 
     let code = useRef();
     let description = useRef();
@@ -61,7 +86,7 @@ const CreateItems = (props) => {
                 id:  Math.random().toString(36).substr(2, 9),
                 code: code.current.value,
                 description: description.current.value,
-                price: price.current.value,
+                price: Number(price.current.value.replace(',', '').replace('$','')),
                 radioType: radioType.current.value,
                 cant: 1,
                 subItem:[],
@@ -73,7 +98,7 @@ const CreateItems = (props) => {
                 id:  Math.random().toString(36).substr(2, 9),
                 code: code.current.value,
                 description: description.current.value,
-                price: price.current.value,
+                price:  Number(price.current.value.replace(',', '').replace('$','')),
                 radioType: radioType.current.value,
                 cant: 1,
                 patter: patter.current.value,
@@ -81,31 +106,26 @@ const CreateItems = (props) => {
             }
             props.loadItem(subItem);
         }
-        event.preventDefault()
+        document.getElementById("price-id").value = ''
         document.getElementById("create-items").reset();
+        event.preventDefault()
     }
 
     const validateCode = (event) => {
         var noValido = /\s/;
         let elemet = event.target.value
-        if(noValido.test(elemet)){ // se chequea el regex de que el string no tenga espacio
+        if(noValido.test(elemet)){ 
             event.target.value = elemet.replace(' ', '');  
         }
     }
 
-    const validatePrice = (event) => {
-        let regex = new RegExp('^[A-Z]+$', 'i');
-        let element = event.target.value
-        if(regex.test(element[element.length-1])){
-            event.target.value = element.replace(element[element.length-1], '')
-        }else{
-            event.target.value = Number(element).toFixed(2)
-        }
-    }
+    const handleChangePrice = (event) => {
+        setValues(event.target.value);
+    };
 
     const handleChange = (event) => {
         radioType.current.value = event.target.value
-      };
+    };
     
     return(
         <div className={classes.root}>
@@ -137,14 +157,18 @@ const CreateItems = (props) => {
                         inputRef={description}
                         required
                     />
-                    <TextField 
-                        className={classes.price} 
-                        id="price-id" 
-                        label="Price" 
+                    <TextField
                         variant="outlined" 
-                        inputRef={price}
-                        defaultValue=""
-                        onChange={(event) => validatePrice(event)}
+                        className={classes.price}
+                        label="Price"
+                        inputRef={price} 
+                        value={values}
+                        onChange={handleChangePrice}
+                        name="numberformat"
+                        id="price-id"
+                        InputProps={{
+                            inputComponent: NumberFormatCustom,
+                        }}
                     />
                     <div className={classes.margin45}>
                         <FormLabel component={classes.legend}>Type</FormLabel>
